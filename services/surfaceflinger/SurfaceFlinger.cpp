@@ -431,6 +431,9 @@ SurfaceFlinger::SurfaceFlinger(Factory& factory) : SurfaceFlinger(factory, SkipI
 
     mDebugFlashDelay = base::GetUintProperty("debug.sf.showupdates"s, 0u);
 
+    mPropagateBackpressure = base::GetBoolProperty("debug.sf.disable_backpressure"s, true);
+    ALOGI_IF(mPropagateBackpressure, "Disabling backpressure propagation");
+
     mBackpressureGpuComposition = base::GetBoolProperty("debug.sf.enable_gl_backpressure"s, true);
     ALOGI_IF(mBackpressureGpuComposition, "Enabling backpressure for GPU composition");
 
@@ -2400,7 +2403,7 @@ bool SurfaceFlinger::commit(PhysicalDisplayId pacesetterId,
         }
     }
 
-    if (pacesetterFrameTarget.isFramePending()) {
+    if (pacesetterFrameTarget.isFramePending() && mPropagateBackpressure) {
         if (mBackpressureGpuComposition || pacesetterFrameTarget.didMissHwcFrame()) {
             scheduleCommit(FrameHint::kNone);
             return false;

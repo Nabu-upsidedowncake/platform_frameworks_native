@@ -107,7 +107,8 @@ class FrameTargeter final : private FrameTarget {
 public:
     FrameTargeter(PhysicalDisplayId displayId, bool backpressureGpuComposition)
           : FrameTarget(to_string(displayId)),
-            mBackpressureGpuComposition(backpressureGpuComposition) {}
+            mBackpressureGpuComposition(backpressureGpuComposition),
+            mPropagateBackpressure(propagateBackpressure) {}
 
     const FrameTarget& target() const { return *this; }
 
@@ -138,6 +139,7 @@ private:
     static bool isFencePending(const FenceTimePtr&, int graceTimeMs);
 
     const bool mBackpressureGpuComposition;
+    const bool mPropagateBackpressure;
 
     TimePoint mScheduledPresentTime;
     CompositionCoverageFlags mCompositionCoverage;
